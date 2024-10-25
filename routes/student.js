@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const Student = require('../models/studentModel');
-const Exam = require('../models/ExamModel');
-const Question = require('../models/QuestionModel');
+const Exam = require('../models/examModel');
+const Question = require('../models/questionModel');
 
 // Middleware to protect routes that require student authentication
 const isAuthenticated = (req, res, next) => {
