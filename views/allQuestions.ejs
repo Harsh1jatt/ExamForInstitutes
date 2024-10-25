@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Exam Questions</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .edit-form {
+            display: none;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Exam Questions</h1>
+    <table id="questionsTable">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Options</th>
+                <th>Correct Answer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Questions will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <div class="edit-form" id="editForm">
+        <h2>Edit Question</h2>
+        <label for="editQuestion">Question Text:</label>
+        <input type="text" id="editQuestion">
+        <label for="editOptions">Options (comma separated):</label>
+        <input type="text" id="editOptions">
+        <label for="editAnswer">Correct Answer:</label>
+        <input type="text" id="editAnswer">
+        <p class="error" id="errorMessage"></p>
+        <label for="editSubfield">Subfield:</label>
+        <input type="text" id="editSubfield">
+        <button id="saveEdit">Save Changes</button>
+        <button id="cancelEdit">Cancel</button>
+        <p class="error" id="editError"></p>
+    </div>
+
+    <script>
+        examId = '671641eb649cb8e2784eed5a';
+        const questionsTable = document.getElementById('questionsTable').getElementsByTagName('tbody')[0];
+        const editForm = document.getElementById('editForm');
+        const editQuestionInput = document.getElementById('editQuestion');
+        const editOptionsInput = document.getElementById('editOptions');
+        const editAnswerInput = document.getElementById('editAnswer');
+        const editSubfieldInput = document.getElementById('editSubfield');
+        const editError = document.getElementById('editError');
+        const saveEditBtn = document.getElementById('saveEdit');
+        const cancelEditBtn = document.getElementById('cancelEdit');
+
+        let currentQuestionId = null;
+
+        // Function to fetch and display all questions
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`/institute/${examId}/questions`);
+                const questions = await response.json();
+                questionsTable.innerHTML = '';
+                questions.forEach(question => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${question.questionText}</td>
+                        <td>${question.options.join(', ')}</td>
+                        <td>${question.correctAnswer}</td>
+                        <td class="actions">
+                            <button onclick="editQuestion('${question._id}')">Edit</button>
+                            <button onclick="deleteQuestion('${question._id}')">Delete</button>
+                        </td>
+                    `;
+                    questionsTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+
+        // Function to edit a question
+        async function editQuestion(questionId) {
+            try {
+                const response = await fetch(`/institute/${questionId}/edit`);
+                const question = await response.json();
+                currentQuestionId = questionId;
+                editQuestionInput.value = question.questionText;
+                editOptionsInput.value = question.options.join(', ');
+                editAnswerInput.value = question.correctAnswer;
+                editSubfieldInput.value = question.subfield || '';
+                editForm.style.display = 'flex';
+            } catch (error) {
+                console.error('Error fetching question:', error);
+            }
+        }
+
+        // Function to save edited question
+        saveEditBtn.addEventListener('click', async () => {
+            const questionText = editQuestionInput.value.trim();
+            const options = editOptionsInput.value.split(',').map(opt => opt.trim());
+            const correctAnswer = editAnswerInput.value.trim();
+            const subfield = editSubfieldInput.value.trim();
+
+            if (!questionText || options.length < 2 || !correctAnswer) {
+                editError.textContent = 'All fields must be filled correctly.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/exams/questions/${currentQuestionId}/edit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ questionText, options, correctAnswer, subfield })
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    editForm.style.display = 'none';
+                    loadQuestions(); // Reload questions after editing
+                } else {
+                    editError.textContent = result.error;
+                }
+            } catch (error) {
+                editError.textContent = 'Error saving question.';
+                console.error('Error saving question:', error);
+            }
+        });
+
+        // Function to cancel editing
+        cancelEditBtn.addEventListener('click', () => {
+            editForm.style.display = 'none';
+            editError.textContent = '';
+        });
+
+        // Function to delete a question
+        async function deleteQuestion(questionId) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                try {
+                    const response = await fetch(`/institute/${questionId}/delete`, {
+                        method: 'POST'
+                    });
+                    if (response.ok) {
+                        loadQuestions(); // Reload questions after deletion
+                    } else {
+                        console.error('Error deleting question:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error deleting question:', error);
+                }
+            }
+        }
+
+        // Initial load of questions when the page loads
+        loadQuestions();
+    </script>
+</body>
+</html>

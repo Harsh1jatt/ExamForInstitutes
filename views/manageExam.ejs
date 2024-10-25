@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Exams</title>
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+  <link rel="stylesheet" href="/css/header.css">
+
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <img height="60" src="./assets/rare.png" alt="logo">
+            </div>
+            <div class="Titles">
+                <h2>Raretech Exam</h2>
+                <p>Raretech Basic Exam -2024</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <img class="userImg" id="userImg" src="/assets/rare.png" alt="User Profile">
+                <div class="details">
+                    <span>Name: <p class="userName" id="userName"></p></span>
+                    <span>RollNo: <p class="rollNumber" id="rollNumber"></p></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+  <main class="dashboard">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="dashboard.html">Dashboard Overview</a></li>
+        <li><a href="manageExams.html">Manage Exams</a></li>
+        <li><a href="manageStudents.html">Manage Students</a></li>
+        <li><a href="#">Exam Results</a></li>
+        <li><a href="#">Notifications</a></li>
+      </ul>
+    </aside>
+
+    <section class="content">
+      <h2>Manage Exams</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Exam Name</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mid-Term Exam</td>
+            <td>Written</td>
+            <td>Scheduled</td>
+            <td>
+              <button>Edit</button>
+              <button>Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Final Exam</td>
+            <td>MCQ</td>
+            <td>Completed</td>
+            <td>
+              <button>Edit</button>
+              <button>Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="add-exam">Add New Exam</button>
+
+      <!-- Add Exam Form -->
+      <div class="add-exam-form">
+        <h3>Add New Exam</h3>
+        <form>
+          <label for="examName">Exam Name:</label>
+          <input type="text" id="examName" name="examName">
+          
+          <label for="examType">Exam Type:</label>
+          <select id="examType" name="examType">
+            <option value="written">Written</option>
+            <option value="mcq">MCQ</option>
+            <option value="practical">Practical</option>
+          </select>
+
+          <label for="examStatus">Status:</label>
+          <select id="examStatus" name="examStatus">
+            <option value="scheduled">Scheduled</option>
+            <option value="completed">Completed</option>
+          </select>
+
+          <button type="submit">Add Exam</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+      <p>&copy; 2024 Institute Name Exam Management</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+creating admin done
+admin can register institute done
+institute can login or logout done
+institute can register students done
+students can login and logout done
+institute can create exam done
+institute can add questions done
+reciving institutes logo not done

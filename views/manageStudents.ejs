@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Students</title>
+  <link rel="stylesheet" href="/css/adminDashboard.css">
+  <link rel="stylesheet" href="/css/header.css">
+
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <img height="60" src="./assets/rare.png" alt="logo">
+            </div>
+            <div class="Titles">
+                <h2>Raretech Exam</h2>
+                <p>Raretech Basic Exam -2024</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <img class="userImg" id="userImg" src="/assets/rare.png" alt="User Profile">
+                <div class="details">
+                    <span>Name: <p class="userName" id="userName"></p></span>
+                    <span>RollNo: <p class="rollNumber" id="rollNumber"></p></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+  <main class="dashboard">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="dashboard.html">Dashboard Overview</a></li>
+        <li><a href="manageExams.html">Manage Exams</a></li>
+        <li><a href="manageStudents.html">Manage Students</a></li>
+        <li><a href="#">Exam Results</a></li>
+        <li><a href="#">Notifications</a></li>
+      </ul>
+    </aside>
+
+    <section class="content">
+      <h2>Manage Students</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Roll Number</th>
+            <th>Enrolled Exams</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John Doe</td>
+            <td>1001</td>
+            <td>Mid-Term Exam, Final Exam</td>
+            <td>
+              <button>Edit</button>
+              <button>Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>1002</td>
+            <td>Mid-Term Exam</td>
+            <td>
+              <button>Edit</button>
+              <button>Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="add-student">Add New Student</button>
+
+      <!-- Add Student Form -->
+      <div class="add-student-form">
+        <h3>Add New Student</h3>
+        <form>
+          <label for="studentName">Student Name:</label>
+          <input type="text" id="studentName" name="studentName">
+          
+          <label for="rollNumber">Roll Number:</label>
+          <input type="text" id="rollNumber" name="rollNumber">
+          
+          <label for="enrolledExams">Enrolled Exams:</label>
+          <input type="text" id="enrolledExams" name="enrolledExams">
+
+          <button type="submit">Add Student</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+      <p>&copy; 2024 Institute Name Exam Management</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Exam</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h2>Create New Exam</h2>
+
+    <!-- examName, examDescription, duration, maxMarks, passMarks  -->
+    <form action="/institute/create-exam" method="post">
+        <label for="examName">Exam Name:</label>
+        <input type="text" id="examName" name="examName" placeholder="Exam Title here..." required>
+        <br>
+        <label for="examDescription">Exam Description:</label>
+        <textarea id="examDescription" name="examDescription" placeholder="Exam Description here..." required></textarea>
+        <br>
+        <label for="duration">Exam Duration:</label>
+        <input type="number" id="duration" name="duration" placeholder="Exam Duration in Minutes" required>
+        <br>
+        <label for="maxMarks">Exam Max Marks:</label>
+        <input type="number" id="maxMarks" name="maxMarks" placeholder="Exam Maximum Marks (Total Marks)" required>
+        <br>
+        <label for="passMarks">Exam Passing Marks:</label>
+        <input type="number" id="passMarks" name="passMarks" placeholder="Exam Maximum Marks (Passing Marks)" required>
+        <br>
+        <button type="submit">Create Exam</button>
+    </form>
+</body>
+</html>

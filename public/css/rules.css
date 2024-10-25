@@ -1,0 +1,91 @@
+
+/* Custom scrollbar for WebKit browsers (Chrome, Safari) */
+.rules-container::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+    height: 8px; /* Height of the horizontal scrollbar */
+}
+
+.rules-container::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scrollbar color */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid #f1f1f1; /* Border around the scrollbar */
+}
+
+.rules-container::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Darker color on hover */
+}
+
+.rules-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1; /* Track color */
+    border-radius: 10px; /* Rounded corners */
+}
+
+/* Custom scrollbar for Firefox */
+.rules-container {
+    scrollbar-width: thin; /* Thin scrollbar */
+    scrollbar-color: #888 #f1f1f1; /* Scrollbar color and track color */
+}
+
+.rules-container:hover {
+    scrollbar-color: #555 #f1f1f1; /* Darker scrollbar color on hover */
+}
+/* Main Css For rules */
+
+.rules{
+    /* display: none; */
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+.rules .header{
+    margin-bottom: 0;
+}
+
+.rules-container {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    overflow-y: auto; /* Scrollbar for overflow content */
+    border-radius: 10px; /* Optional rounded corners */
+}
+
+
+.rules-list {
+    list-style: none;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.rules-list li {
+    font-size: 1.2em;
+    color: #555;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+}
+
+.rules-list li .rule-icon {
+    font-size: 1.8em;
+    color: #0275d8;
+    margin-right: 15px;
+}
+
+.btn-proceed {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #0275d8;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    align-self: right;
+    transition: background-color 0.3s ease;
+    /* width: 100%; */
+}
+
+.btn-proceed:hover {
+    background-color: #025aa5;
+}

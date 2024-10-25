@@ -1,0 +1,103 @@
+body::-webkit-scrollbar, .typing-text::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+    height: 8px; /* Height of the horizontal scrollbar */
+}
+body::-webkit-scrollbar-thumb, .typing-text::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scrollbar color */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px 
+}
+body::-webkit-scrollbar-thumb:hover, .typing-text::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Darker color on hover */
+}
+
+body::-webkit-scrollbar-track, .typing-text::-webkit-scrollbar-track {
+    background-color: #f1f1f1; /* Track color */
+    border-radius: 10px; /* Rounded corners */
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: roboto;
+}
+
+
+.header {
+    width: 100%;
+    background: #E7EDF5;
+    font-size: 20px;
+    color: blue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 10px 0px 20px black;
+}
+.header h1{
+    margin: 0;
+}
+.SelectExam{
+    height: 100%;
+    width: 100%;
+}
+
+.exam-options {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.exam-card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 350px;
+    margin: 15px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.exam-card:hover {
+    transform: translateY(-10px);
+}
+
+.exam-card h2 {
+    font-size: 1.8em;
+    color: #0275d8;
+    margin-bottom: 15px;
+}
+
+.exam-card p {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn-select {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #0275d8;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn-select:hover {
+    background-color: #025aa5;
+}
+
