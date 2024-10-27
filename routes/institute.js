@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const instituteModel = require("../models/instituteModel");
 const Student = require("../models/studentModel");
-const Exam = require("../models/ExamModel");
-const Question = require("../models/QuestionModel");
+const Exam = require("../models/examModel");
+const TypingTest = require("../models/typingTestModel");
+const Question = require("../models/questionModel");
 const authMiddleware = require("../middlewares/auth");
 const bcrypt = require("bcrypt");
 const upload = require('../config/multer-config')
@@ -363,5 +364,130 @@ router.post("/:questionId/delete", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
+// Typing test routes
+// Create a Typing Test
+router.post('/typing-test/create', authMiddleware, async (req, res) => {
+  const { title, passage, duration } = req.body;
+  try {
+    const newTest = new TypingTest({
+      institute: req.user.id,
+      title,
+      passage,
+      duration,
+      totalWords: passage.split(' ').length,
+    });
+    await newTest.save();
+    res.status(201).json({ message: 'Typing test created successfully', test: newTest });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get All Typing Tests for an Institute
+router.get('/:instituteId/typing-tests', async (req, res) => {
+  const { instituteId } = req.params;
+  try {
+    const typingTests = await TypingTest.find({ institute: instituteId });
+    res.status(200).json(typingTests);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get Details of a Specific Typing Test
+router.get('/typing-test/:testId', async (req, res) => {
+  const { testId } = req.params;
+  try {
+    const typingTest = await TypingTest.findById(testId);
+    if (!typingTest) {
+      return res.status(404).json({ error: 'Typing test not found' });
+    }
+    res.status(200).json(typingTest);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Submit a Typing Test (Store Submission in TypingTest Model)
+router.post('/typing-test/:testId/submit', authMiddleware, async (req, res) => {
+  const { testId } = req.params;
+  const { typedText, elapsedTime } = req.body;
+
+  try {
+    const typingTest = await TypingTest.findById(testId);
+    if (!typingTest) {
+      return res.status(404).json({ error: "Typing test not found" });
+    }
+
+    const totalWords = typingTest.passage.split(' ').length;
+    const typedWords = typedText.split(' ').length;
+
+    // Calculate Accuracy
+    const correctWords = typingTest.passage
+      .split(' ')
+      .filter((word, index) => word === typedText.split(' ')[index]).length;
+    const accuracy = (correctWords / totalWords) * 100;
+
+    // Calculate Speed (WPM - Words Per Minute)
+    const wordsPerMinute = (typedWords / (elapsedTime / 60)).toFixed(2);
+
+    // Add the result to the typing test's results array
+    typingTest.results.push({
+      student: req.user.id,
+      wpm: wordsPerMinute,
+      accuracy: accuracy,
+      dateTaken: new Date(),
+    });
+
+    await typingTest.save();
+
+    res.status(201).json({
+      message: "Typing test submitted successfully",
+      result: {
+        wpm: wordsPerMinute,
+        accuracy: accuracy,
+        elapsedTime,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get All Submissions for a Specific Typing Test
+router.get('/typing-test/:testId/submissions', async (req, res) => {
+  const { testId } = req.params;
+  try {
+    const typingTest = await TypingTest.findById(testId).populate("results.student", "studentName rollNumber");
+    if (!typingTest) {
+      return res.status(404).json({ error: "Typing test not found" });
+    }
+    res.status(200).json(typingTest.results);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get a Specific Submission by a Student for a Typing Test
+router.get('/typing-test/:testId/submission/:studentId', async (req, res) => {
+  const { testId, studentId } = req.params;
+  try {
+    const typingTest = await TypingTest.findById(testId);
+    if (!typingTest) {
+      return res.status(404).json({ error: "Typing test not found" });
+    }
+    const submission = typingTest.results.find(result => result.student.toString() === studentId);
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" });
+    }
+    res.status(200).json(submission);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;
