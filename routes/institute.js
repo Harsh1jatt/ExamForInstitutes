@@ -490,4 +490,47 @@ router.get('/typing-test/:testId/submission/:studentId', async (req, res) => {
 });
 
 
+// Edit Typing Test
+router.post('/:typingTestId/edit', async (req, res) => {
+  const { typingTestId } = req.params;
+  const { title, passage, duration } = req.body;
+
+  try {
+    const updateFields = {};
+    if (title !== undefined) updateFields.title = title;
+    if (passage !== undefined) {
+      updateFields.passage = passage;
+      updateFields.totalWords = passage.split(' ').length;
+    }
+    if (duration !== undefined) updateFields.duration = duration;
+
+    const test = await TypingTest.findByIdAndUpdate(typingTestId, updateFields, { new: true });
+
+    if (!test) {
+      return res.status(404).json({ error: "Typing test not found" });
+    }
+
+    res.status(200).json({ message: "Typing test updated successfully", test });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete Typing Test
+router.post('/:typingTestId/delete', async (req, res) => {
+  const { typingTestId } = req.params;
+
+  try {
+    const test = await TypingTest.findByIdAndDelete(typingTestId);
+    if (!test) {
+      return res.status(404).json({ error: "Typing test not found" });
+    }
+
+    res.status(200).json({ message: "Typing test deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 module.exports = router;
