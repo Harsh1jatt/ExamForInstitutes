@@ -17,14 +17,12 @@ connectDB();
 // Enable helmet for basic security
 app.use(helmet());
 
-// CORS Configuration: Allow requests from localhost in development, or your production URL
+// CORS Configuration: Allow requests from localhost in development and your production URL
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-react-app-url.com'   // Production URL (replace with your deployed React app URL)
-    : 'http://localhost:3000',            // Development URL (React running locally)
+  origin: ['http://localhost:3000', 'https://your-react-app-url.com'], // Add both development and production URLs here
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // Allows cookies
+  credentials: true,  // Allows cookies to be sent
 };
 
 app.use(cors(corsOptions));
