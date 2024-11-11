@@ -11,13 +11,13 @@ const upload = require('../config/multer-config')
 
 router.get("/my-institute", authMiddleware, async (req, res) => {
   try {
-    // Ensure that the authenticated user is an institute
+    // Check if the user is an institute
     if (req.userType !== 'institute') {
       return res.status(403).json({ error: 'Access forbidden: Not an institute' });
     }
 
-    // Fetch the institute details from the database
-    const institute = req.institute; // This was set in the authMiddleware
+    // Use the institute from the request object (set in authMiddleware)
+    const institute = req.institute; // No need to query again as it's already fetched
 
     if (!institute) {
       return res.status(404).json({ error: "Institute not found" });
