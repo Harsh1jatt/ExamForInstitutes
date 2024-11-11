@@ -11,12 +11,26 @@ const upload = require('../config/multer-config')
 
 router.get("/my-institute", authMiddleware, async (req, res) => {
   try {
-    const institute = await instituteModel.findById(req.user.id);
+    // Ensure that the authenticated user is an institute
+    if (req.userType !== 'institute') {
+      return res.status(403).json({ error: 'Access forbidden: Not an institute' });
+    }
+
+    // Fetch the institute details from the database
+    const institute = req.institute; // This was set in the authMiddleware
+
+    if (!institute) {
+      return res.status(404).json({ error: "Institute not found" });
+    }
+
+    // Send the institute details as a response
     res.status(200).json(institute);
   } catch (error) {
+    console.error("Error fetching institute details:", error);
     res.status(400).json({ error: "Error fetching institute details." });
   }
 });
+
 
 
 // Route to create and add a student to an institute
