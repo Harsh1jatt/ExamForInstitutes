@@ -24,7 +24,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,  // Allow cookies to be sent
 }));
-app.use(cors(corsOptions));
 
 // Configure session
 app.use(session({
