@@ -10,10 +10,6 @@ const bcrypt = require("bcrypt");
 const upload = require('../config/multer-config')
 
 router.get("/my-institute", authMiddleware, async (req, res) => {
-  if (req.user.role !== "institute") {
-    return res.status(403).json({ error: "Only institutes can view this." });
-  }
-
   try {
     const institute = await instituteModel.findById(req.user.id);
     res.status(200).json(institute);
