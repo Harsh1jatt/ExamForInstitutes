@@ -105,7 +105,7 @@ router.post("/:instituteId/student", upload.single("image"), async (req, res) =>
 });
 
 // Route to create an exam
-router.post("/:instituteId/exams", async (req, res) => {
+router.post("/:instituteId/exam", async (req, res) => {
   const { instituteId } = req.params;
   try {
     // Find the institute by ID
@@ -208,7 +208,7 @@ router.get("/:examId/questions", async (req, res) => {
 // update feature
 
 // Edit exam (excluding password updates)
-router.post("/:examId/edit", async (req, res) => {
+router.post("/:examId/edit-exam", async (req, res) => {
   const { examId } = req.params;
   const { examName, examDescription, duration, maxMarks, passMarks } = req.body;
 
@@ -239,7 +239,7 @@ router.post("/:examId/edit", async (req, res) => {
 });
 
 
-router.post("/:questionId/edit", async (req, res) => {
+router.post("/:questionId/edit-question", async (req, res) => {
   const { questionId } = req.params;
   const { questionText, options, correctAnswer, subfield } = req.body;
 
@@ -270,7 +270,7 @@ router.post("/:questionId/edit", async (req, res) => {
   }
 });
 
-router.post("/:studentId/edit", async (req, res) => {
+router.post("/:studentId/edit-student", async (req, res) => {
   const { studentId } = req.params;
   const { name, rollNumber, dateOfBirth } = req.body;
 
@@ -299,6 +299,7 @@ router.post("/:studentId/edit", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 // Delete Feature
