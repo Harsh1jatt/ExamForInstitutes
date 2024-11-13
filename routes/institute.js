@@ -308,7 +308,7 @@ router.post("/:studentId/edit-student", async (req, res) => {
 
 
 // Delete student and remove reference from institute
-router.post("/:studentId/delete", async (req, res) => {
+router.post("/:studentId/delete-student", async (req, res) => {
     const { studentId } = req.params;
   
     try {
@@ -331,7 +331,7 @@ router.post("/:studentId/delete", async (req, res) => {
   });
   
 // Delete exam and remove reference from institute
-router.post("/:examId/delete", async (req, res) => {
+router.post("/:examId/delete-exam", async (req, res) => {
   const { examId } = req.params;
 
   try {
@@ -354,7 +354,7 @@ router.post("/:examId/delete", async (req, res) => {
 });
 
 // Delete question and remove reference from exam
-router.post("/:questionId/delete", async (req, res) => {
+router.post("/:questionId/delete-question", async (req, res) => {
   const { questionId } = req.params;
 
   try {
