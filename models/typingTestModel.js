@@ -6,6 +6,11 @@ const TypingTestSchema = new mongoose.Schema({
         ref: 'Institute',
         required: true,
     },
+    exam: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Exam',
+        required: true,
+    },
     title: {
         type: String,
         required: true,
