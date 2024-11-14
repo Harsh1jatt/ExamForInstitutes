@@ -358,19 +358,49 @@ router.post("/:questionId/delete-question", async (req, res) => {
   const { questionId } = req.params;
 
   try {
-    // Find and remove the question
+    // Find the question by ID
     let question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({ error: "Question not found" });
     }
 
-    // Remove question from the related exam's questions array
+    // Remove the question ID from the related exam's questions array
     await Exam.updateOne(
       { _id: question.exam },
       { $pull: { questions: questionId } }
     );
 
+    // Delete the question from the Question collection
+    await Question.findByIdAndDelete(questionId);
+
     res.status(200).json({ message: "Question deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+router.post("/:examId/delete-all-questions", async (req, res) => {
+  const { examId } = req.params;
+
+  try {
+    // Find the exam document by ID
+    const exam = await Exam.findById(examId);
+    if (!exam) {
+      return res.status(404).json({ error: "Exam not found" });
+    }
+
+    // Check if there are any questions associated with this exam
+    if (exam.questions.length === 0) {
+      return res.status(400).json({ message: "No questions to delete for this exam" });
+    }
+
+    // Delete all questions from the Question collection that belong to this exam
+    await Question.deleteMany({ _id: { $in: exam.questions } });
+
+    // Clear the questions array in the Exam document
+    exam.questions = [];
+    await exam.save();
+
+    res.status(200).json({ message: "All questions deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
