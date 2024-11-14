@@ -410,11 +410,12 @@ router.post("/:examId/delete-all-questions", async (req, res) => {
 
 // Typing test routes
 // Create a Typing Test
-router.post('/typing-test/create', authMiddleware, async (req, res) => {
+router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   const { title, passage, duration } = req.body;
   try {
     const newTest = new TypingTest({
       institute: req.user.id,
+      exam: req.params.examid,
       title,
       passage,
       duration,
