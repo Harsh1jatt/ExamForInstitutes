@@ -11,26 +11,12 @@ const upload = require('../config/multer-config')
 
 router.get("/my-institute", authMiddleware, async (req, res) => {
   try {
-    // Check if the user is an institute
-    if (req.userType !== 'institute') {
-      return res.status(403).json({ error: 'Access forbidden: Not an institute' });
-    }
-
-    // Use the institute from the request object (set in authMiddleware)
-    const institute = req.institute; // No need to query again as it's already fetched
-
-    if (!institute) {
-      return res.status(404).json({ error: "Institute not found" });
-    }
-
-    // Send the institute details as a response
+    const institute = await instituteModel.findById(req.user.id);
     res.status(200).json(institute);
   } catch (error) {
-    console.error("Error fetching institute details:", error);
     res.status(400).json({ error: "Error fetching institute details." });
   }
 });
-
 
 
 // Route to create and add a student to an institute
@@ -301,7 +287,6 @@ router.post("/:studentId/edit-student", async (req, res) => {
 });
 
 
-
 // Delete Feature
 
 
@@ -408,13 +393,13 @@ router.post("/:examId/delete-all-questions", async (req, res) => {
 
 
 
+
 // Typing test routes
 // Create a Typing Test
 router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   const { title, passage, duration } = req.body;
   try {
     const newTest = new TypingTest({
-      institute: req.user.id,
       exam: req.params.examid,
       title,
       passage,
@@ -428,16 +413,7 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   }
 });
 
-// Get All Typing Tests for an Institute
-router.get('/:instituteId/typing-tests', async (req, res) => {
-  const { instituteId } = req.params;
-  try {
-    const typingTests = await TypingTest.find({ institute: instituteId });
-    res.status(200).json(typingTests);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+
 
 // Get Details of a Specific Typing Test
 router.get('/typing-test/:testId', async (req, res) => {
@@ -528,49 +504,6 @@ router.get('/typing-test/:testId/submission/:studentId', async (req, res) => {
     res.status(200).json(submission);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
-});
-
-
-// Edit Typing Test
-router.post('/:typingTestId/edit', async (req, res) => {
-  const { typingTestId } = req.params;
-  const { title, passage, duration } = req.body;
-
-  try {
-    const updateFields = {};
-    if (title !== undefined) updateFields.title = title;
-    if (passage !== undefined) {
-      updateFields.passage = passage;
-      updateFields.totalWords = passage.split(' ').length;
-    }
-    if (duration !== undefined) updateFields.duration = duration;
-
-    const test = await TypingTest.findByIdAndUpdate(typingTestId, updateFields, { new: true });
-
-    if (!test) {
-      return res.status(404).json({ error: "Typing test not found" });
-    }
-
-    res.status(200).json({ message: "Typing test updated successfully", test });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Delete Typing Test
-router.post('/:typingTestId/delete', async (req, res) => {
-  const { typingTestId } = req.params;
-
-  try {
-    const test = await TypingTest.findByIdAndDelete(typingTestId);
-    if (!test) {
-      return res.status(404).json({ error: "Typing test not found" });
-    }
-
-    res.status(200).json({ message: "Typing test deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 });
 
