@@ -11,9 +11,13 @@ const upload = require('../config/multer-config')
 
 router.get("/my-institute", authMiddleware, async (req, res) => {
   try {
-    const institute = await instituteModel.findById(req.user.id);
-    res.status(200).json(institute);
+    if (req.userType === 'institute' && req.institute) {
+      res.status(200).json(req.institute); // Send the institute data
+    } else {
+      res.status(403).json({ error: "Access denied. Not an institute user." });
+    }
   } catch (error) {
+    console.error("Error fetching institute details:", error);
     res.status(400).json({ error: "Error fetching institute details." });
   }
 });
