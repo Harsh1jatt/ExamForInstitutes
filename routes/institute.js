@@ -450,6 +450,35 @@ router.get('/:examid/typing-test', async (req, res) => {
   }
 });
 
+// Update a typing test by ID
+router.post('/:testid/typing-test', async (req, res) => {
+  try {
+    // Extract test ID from params and updated data from the request body
+    const { testid } = req.params;
+    const updatedData = req.body;
+
+    // Find the typing test by ID and update it
+    const typingTest = await TypingTest.findByIdAndUpdate(
+      testid,
+      updatedData,
+      { new: true } // Return the updated document
+    );
+
+    // If the typing test doesn't exist, return a 404 response
+    if (!typingTest) {
+      return res.status(404).json({ message: 'Typing test not found' });
+    }
+
+    // Return the updated typing test
+    res.status(200).json({
+      message: 'Typing test updated successfully',
+      typingTest,
+    });
+  } catch (error) {
+    console.error('Error updating typing test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 
