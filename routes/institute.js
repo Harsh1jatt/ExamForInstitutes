@@ -451,7 +451,7 @@ router.get('/:examid/typing-test', async (req, res) => {
 });
 
 // Update a typing test by ID
-router.post('/:testid/typing-test', async (req, res) => {
+router.post('/:testid/edit-typingtest', async (req, res) => {
   try {
     // Extract test ID from params and updated data from the request body
     const { testid } = req.params;
