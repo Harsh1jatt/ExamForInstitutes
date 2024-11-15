@@ -400,9 +400,14 @@ router.post("/:examId/delete-all-questions", async (req, res) => {
 
 // Typing test routes
 // Create a Typing Test
+const { TypingTest } = require('./models/TypingTest'); // Adjust path as needed
+const { Exam } = require('./models/Exam'); // Adjust path as needed
+
 router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   const { title, passage, duration } = req.body;
+  
   try {
+    // Create the new Typing Test
     const newTest = new TypingTest({
       exam: req.params.examid,
       title,
@@ -411,8 +416,41 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
       totalWords: passage.split(' ').length,
     });
     await newTest.save();
-    res.status(201).json({ message: 'Typing test created successfully', test: newTest });
+
+    // Update the Exam to include the Typing Test ID
+    await Exam.findByIdAndUpdate(
+      req.params.examid,
+      { $push: { typingTests: newTest._id } }, // Assuming Exam schema has `typingTests` array
+      { new: true } // Return the updated document
+    );
+
+    // Respond with success
+    res.status(201).json({
+      message: 'Typing test created successfully',
+      test: newTest,
+    });
   } catch (error) {
+    console.error('Error creating typing test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/:examid/typing-test', authMiddleware, async (req, res) => {
+  try {
+    // Fetch the exam and populate its typing tests
+    const exam = await Exam.findById(req.params.examid).populate('typingTests');
+
+    if (!exam) {
+      return res.status(404).json({ message: 'Exam not found' });
+    }
+
+    // Return the typing test details
+    res.status(200).json({
+      message: 'Typing tests fetched successfully',
+      typingTests: exam.typingTests,
+    });
+  } catch (error) {
+    console.error('Error fetching typing tests:', error);
     res.status(500).json({ error: error.message });
   }
 });
