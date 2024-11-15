@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const TypingTestSchema = new mongoose.Schema({
-    institute: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Institute',
-        required: true,
-    },
     exam: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Exam',
