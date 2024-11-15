@@ -18,6 +18,10 @@ const examSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'question',
     }],
+    typingTest: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'TypingTest',
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'institute',
@@ -27,6 +31,7 @@ const examSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'student'
     }],
+
     dateCreated: {
         type: Date,
         default: Date.now
