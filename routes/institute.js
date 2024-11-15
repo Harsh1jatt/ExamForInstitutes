@@ -432,23 +432,24 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
 
 router.get('/:examid/typing-test', async (req, res) => {
   try {
-    // Fetch the exam and populate its typing test
-    const typingTest = await TypingTest.findOne({exam:req.params.examid});
+    // Fetch the typing test associated with the given exam ID
+    const typingTest = await TypingTest.findOne({ exam: req.params.examid });
 
-    if (!exam) {
-      return res.status(404).json({ message: 'Exam not found' });
+    if (!typingTest) {
+      return res.status(404).json({ message: 'Typing test not found' });
     }
 
     // Return the typing test details
     res.status(200).json({
-      message: 'Typing tests fetched successfully',
-      typingTest
+      message: 'Typing test fetched successfully',
+      typingTest,
     });
   } catch (error) {
     console.error('Error fetching typing tests:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 
