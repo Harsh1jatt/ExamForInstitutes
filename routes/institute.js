@@ -398,11 +398,6 @@ router.post("/:examId/delete-all-questions", async (req, res) => {
 
 
 
-// Typing test routes
-// Create a Typing Test
-const { TypingTest } = require('./models/TypingTest'); // Adjust path as needed
-const { Exam } = require('./models/Exam'); // Adjust path as needed
-
 router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   const { title, passage, duration } = req.body;
   
