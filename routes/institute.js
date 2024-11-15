@@ -430,7 +430,7 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   }
 });
 
-router.get('/:examid/typing-test', authMiddleware, async (req, res) => {
+router.get('/:examid/typing-test', async (req, res) => {
   try {
     // Fetch the exam and populate its typing tests
     const exam = await Exam.findById(req.params.examid).populate('typingTests');
