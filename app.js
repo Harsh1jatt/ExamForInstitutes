@@ -14,17 +14,26 @@ const helmet = require('helmet');
 // Connect to MongoDB
 connectDB();
 
-// Enable helmet for basic security
-app.use(helmet());
 
-// Allow requests from any domain with CORS
+
+// Apply CORS before other middleware
 app.use(cors({
   origin: '*', // Allow all domains
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+}))
+// Enable helmet for basic security
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Disables resource policy for CORS
 }));
 
-// Configure session
+
+// Configurapp.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Debug: force header
+  console.log('CORS headers added for:', req.url);
+  next();
+});
+e session
 app.use(session({
   secret: process.env.EXPRESS_SECRET,  
   resave: false,
