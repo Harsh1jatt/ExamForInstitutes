@@ -14,42 +14,42 @@ const helmet = require('helmet');
 // Connect to MongoDB
 connectDB();
 
-
-
 // Apply CORS before other middleware
-app.use(cors({
-  origin: '*', // Allow all domains
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}))
-// Enable helmet for basic security
-app.use(helmet({
-  crossOriginResourcePolicy: false, // Disables resource policy for CORS
-}));
+app.use(
+  cors({
+    origin: '*', // Allow all domains
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
+// Enable Helmet for security with adjusted configuration for CORS
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false, // Disables resource policy for CORS
+  })
+);
 
-// Configurapp.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Debug: force header
-  console.log('CORS headers added for:', req.url);
+// Debug Middleware to Log and Force CORS Headers
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Debugging CORS
+  console.log(`CORS headers added for: ${req.url}`);
   next();
 });
-e session
-app.use(session({
-  secret: process.env.EXPRESS_SECRET,  
-  resave: false,
-  saveUninitialized: true,
-}));
+
+// Configure session
+app.use(
+  session({
+    secret: process.env.EXPRESS_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Set up view engine (EJS)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
-});
 
 // Body parser middleware
 app.use(express.json());
@@ -64,6 +64,12 @@ app.use('/student', studentRouter);
 // Default route for undefined endpoints
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint not found' });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
 });
 
 // Start the server
