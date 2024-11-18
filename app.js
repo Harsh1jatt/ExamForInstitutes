@@ -17,12 +17,11 @@ connectDB();
 // Enable helmet for basic security
 app.use(helmet());
 
-// Allow any origin (be cautious with this in production)
+// Allow requests from any domain with CORS
 app.use(cors({
-  origin: '*', // This allows any origin (use cautiously in production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: '*', // Allow all domains
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,  // Allow cookies to be sent
 }));
 
 // Configure session
@@ -52,6 +51,11 @@ app.use('/', indexRouter);
 app.use('/owner', ownerRouter);
 app.use('/institute', instituteRouter);
 app.use('/student', studentRouter);
+
+// Default route for undefined endpoints
+app.use((req, res) => {
+  res.status(404).json({ message: 'Endpoint not found' });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
