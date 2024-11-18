@@ -107,11 +107,7 @@ router.post('/logout', (req, res) => {
 });
 
 // Get all institutes (Only for Owner)
-router.get('/institutes', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'owner') {
-        return res.status(403).json({ error: 'Only owners can view all institutes.' });
-    }
-
+router.get('/institutes', async (req, res) => {
     try {
         const institutes = await Institute.find();
         res.status(200).json(institutes);
@@ -119,6 +115,7 @@ router.get('/institutes', authMiddleware, async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 
 // Updating Institute Data
 router.post('/:instituteId/edit', upload.fields([{ name: 'iso', maxCount: 1 }, { name: 'logo', maxCount: 1 }]), async (req, res) => {
