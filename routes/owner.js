@@ -35,14 +35,14 @@ router.post('/create-owner', async (req, res) => {
     }
 });
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     res.json('Hello, this is the owner dashboard');
 });
 
 // Create Institute
 router.post('/create-institute', upload.fields([{ name: 'iso', maxCount: 1 }, { name: 'logo', maxCount: 1 }]), async (req, res) => {
-    const { ownerName, password, email, uniqueId, instituteName, shortName } = req.body;
-    
+    const { ownerName, password, email, uniqueId, phone, instituteName, shortName } = req.body;
+
     try {
         const existingInstitute = await Institute.findOne({ $or: [{ email }, { uniqueId }] });
         if (existingInstitute) {
@@ -57,12 +57,13 @@ router.post('/create-institute', upload.fields([{ name: 'iso', maxCount: 1 }, { 
             shortName,
             password: hashedPassword,
             email,
+            phone,
             uniqueId,
-            iso: req.files.iso ? req.files.iso[0].publicUrl : "",  
-            logo: req.files.logo ? req.files.logo[0].publicUrl : "", 
+            iso: req.files.iso ? req.files.iso[0].publicUrl : "",
+            logo: req.files.logo ? req.files.logo[0].publicUrl : "",
             secCode: password
         });
-        
+
         await newInstitute.save();
 
         res.status(201).json({ message: 'Institute created successfully', newInstitute });
@@ -107,7 +108,11 @@ router.post('/logout', (req, res) => {
 });
 
 // Get all institutes (Only for Owner)
-router.get('/institutes', async (req, res) => {
+router.get('/institutes', authMiddleware, async (req, res) => {
+    if (req.user.role !== 'owner') {
+        return res.status(403).json({ error: 'Only owners can view all institutes.' });
+    }
+
     try {
         const institutes = await Institute.find();
         res.status(200).json(institutes);
@@ -116,11 +121,10 @@ router.get('/institutes', async (req, res) => {
     }
 });
 
-
 // Updating Institute Data
 router.post('/:instituteId/edit', upload.fields([{ name: 'iso', maxCount: 1 }, { name: 'logo', maxCount: 1 }]), async (req, res) => {
     const { instituteId } = req.params;
-    const { ownerName, email, uniqueId, instituteName, shortName } = req.body;
+    const { ownerName, email, uniqueId, phone, instituteName, shortName } = req.body;
 
     try {
         let institute = await Institute.findById(instituteId);
@@ -141,6 +145,7 @@ router.post('/:instituteId/edit', upload.fields([{ name: 'iso', maxCount: 1 }, {
         institute.instituteName = instituteName || institute.instituteName;
         institute.shortName = shortName || institute.shortName;
         institute.email = email || institute.email;
+        institute.phone = phone || institute.phone;
         institute.uniqueId = uniqueId || institute.uniqueId;
 
         if (req.files.iso) {
