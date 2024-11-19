@@ -108,11 +108,7 @@ router.post('/logout', (req, res) => {
 });
 
 // Get all institutes (Only for Owner)
-router.get('/institutes', authMiddleware, async (req, res) => {
-    if (req.user.role !== 'owner') {
-        return res.status(403).json({ error: 'Only owners can view all institutes.' });
-    }
-
+router.get('/institutes', async (req, res) => {
     try {
         const institutes = await Institute.find();
         res.status(200).json(institutes);
