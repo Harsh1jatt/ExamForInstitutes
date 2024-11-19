@@ -32,8 +32,7 @@ app.use(
 
 // Debug Middleware to Log and Force CORS Headers
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Debugging CORS
-  console.log(`CORS headers added for: ${req.url}`);
+  res.setHeader('Access-Control-Allow-Origin', '*');
   next();
 });
 
