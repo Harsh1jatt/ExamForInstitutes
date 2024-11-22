@@ -10,7 +10,6 @@ const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
 
 // Connect to MongoDB
 connectDB();
@@ -30,8 +29,6 @@ app.use(
     crossOriginResourcePolicy: false,
   })
 );
-
-app.use(morgan('dev')); // Log requests
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
