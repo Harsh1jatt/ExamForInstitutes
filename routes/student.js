@@ -70,7 +70,7 @@ router.post('/logout', (req, res) => {
 });
 
 // Protected route (example)
-router.get('/profile', isAuthenticated, (req, res) => {
+router.get('/profile', (req, res) => {
     res.status(200).json({
         message: 'Profile accessed successfully',
         student: req.session.student
