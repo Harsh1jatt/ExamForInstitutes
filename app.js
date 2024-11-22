@@ -10,49 +10,50 @@ const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
+const morgan = require('morgan');
 
 // Connect to MongoDB
 connectDB();
 
-// Apply CORS before other middleware
+// Middleware
 app.use(
   cors({
-    origin: '*', // Allow all domains
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
-// Enable Helmet for security with adjusted configuration for CORS
 app.use(
   helmet({
-    crossOriginResourcePolicy: false, // Disables resource policy for CORS
+    crossOriginResourcePolicy: false,
   })
 );
 
-// Debug Middleware to Log and Force CORS Headers
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(morgan('dev')); // Log requests
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Configure session
 app.use(
   session({
-    secret: process.env.EXPRESS_SECRET,
+    secret: process.env.EXPRESS_SECRET || 'default_secret',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
+    },
   })
 );
 
-// Set up view engine (EJS)
+// Set up view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 
 // Route Handlers
 app.use('/', indexRouter);
@@ -60,15 +61,20 @@ app.use('/owner', ownerRouter);
 app.use('/institute', instituteRouter);
 app.use('/student', studentRouter);
 
-// Default route for undefined endpoints
+// 404 Handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Endpoint not found' });
+  res.status(404).json({ error: 'API endpoint not found' });
 });
 
-// Error handling middleware
+// Error Handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    error: { message: err.message || 'Internal Server Error' },
+  });
 });
 
 // Start the server
