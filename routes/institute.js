@@ -400,7 +400,7 @@ router.post("/:examId/delete-all-questions", async (req, res) => {
 
 router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
   const { title, passage, duration } = req.body;
-  
+
   try {
     // Create the new Typing Test
     const newTest = new TypingTest({
@@ -415,7 +415,7 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
     // Update the Exam to include the Typing Test ID
     await Exam.findByIdAndUpdate(
       req.params.examid,
-      typingTest: newTest._id, // Assuming Exam schema has `typingTests` array
+      { typingTest: newTest._id }, // Corrected: Wrapped in curly braces
       { new: true } // Return the updated document
     );
 
@@ -429,6 +429,7 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get('/:examid/typing-test', async (req, res) => {
   try {
