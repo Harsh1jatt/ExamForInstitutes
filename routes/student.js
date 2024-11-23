@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        const student = await Student.findOne({ rollNumber }).populate('institute');
+        const student = await Student.findOne({ rollNumber });
         if (!student) {
             return res.status(400).json({ error: 'Invalid roll number or password' });
         }
