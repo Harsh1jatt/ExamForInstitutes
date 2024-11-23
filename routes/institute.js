@@ -415,7 +415,7 @@ router.post('/:examid/typing-test/create', authMiddleware, async (req, res) => {
     // Update the Exam to include the Typing Test ID
     await Exam.findByIdAndUpdate(
       req.params.examid,
-      { $push: { typingTests: newTest._id } }, // Assuming Exam schema has `typingTests` array
+      typingTest: newTest._id, // Assuming Exam schema has `typingTests` array
       { new: true } // Return the updated document
     );
 
