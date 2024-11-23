@@ -1,10 +1,12 @@
 
+
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Student = require('../models/studentModel');
 const Exam = require('../models/examModel');
+const Institute = require('../models/instituteModel.js');
 const  JWT_EXPIRATION = '3h'; // Ensure to set these in your environment variables
 
 // Middleware to protect routes using JWT
@@ -77,7 +79,8 @@ router.post('/logout', (req, res) => {
 // Fetch student profile with institute details
 router.get('/profile', isAuthenticated, async (req, res) => {
     try {
-        const student = await Student.findById(req.student.id).populate('institute');
+        const student = await Student.findById(req.student.id);
+        const institute = await Institute.findById(student.institute);
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
         }
@@ -85,6 +88,7 @@ router.get('/profile', isAuthenticated, async (req, res) => {
         res.status(200).json({
             message: 'Profile accessed successfully',
             student,
+            institute
         });
     } catch (error) {
         res.status(500).json({ error: 'Server error: ' + error.message });
