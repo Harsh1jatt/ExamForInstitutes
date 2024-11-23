@@ -77,7 +77,7 @@ router.post('/logout', (req, res) => {
 // Fetch student profile with institute details
 router.get('/profile', isAuthenticated, async (req, res) => {
     try {
-        const student = await Student.findById(req.student.id);
+        const student = await Student.findById(req.student.id).populate('institute');
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
         }
