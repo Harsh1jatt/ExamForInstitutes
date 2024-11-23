@@ -42,7 +42,6 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid roll number or password' });
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             {
                 id: student._id,
@@ -51,7 +50,7 @@ router.post('/login', async (req, res) => {
                 institute: student.institute,
             },
             process.env.JWT_SECRET,
-            { expiresIn: JWT_EXPIRATION || '1h' }
+            { expiresIn: '3h' }
         );
 
         res.status(200).json({
@@ -68,6 +67,7 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ error: 'Server error: ' + error.message });
     }
 });
+
 
 // Student logout (JWT logout is handled client-side by removing the token)
 router.post('/logout', (req, res) => {
