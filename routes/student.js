@@ -1,16 +1,25 @@
+
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const Student = require('../models/studentModel');
 const Exam = require('../models/examModel');
-const Question = require('../models/questionModel');
+const  JWT_EXPIRATION = '3h'; // Ensure to set these in your environment variables
 
-// Middleware to protect routes that require student authentication
-const isAuthenticated = (req, res, next) => {
-    if (req.session.student) {
-        return next();  // Continue if the student is authenticated
-    } else {
-        return res.status(401).json({ error: 'Unauthorized: Please log in to access this route.' });
+// Middleware to protect routes using JWT
+const isAuthenticated = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Get the token from the Authorization header
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: Token not provided' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.student = decoded; // Attach decoded data to the request
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid token' });
     }
 };
 
@@ -23,68 +32,72 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        // Find the student by roll number
-        const student = await Student.findOne({ rollNumber });
-
+        const student = await Student.findOne({ rollNumber }).populate('institute');
         if (!student) {
             return res.status(400).json({ error: 'Invalid roll number or password' });
         }
 
-        // Compare the entered password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, student.password);
-
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid roll number or password' });
         }
 
-        // Password is correct, log in the student by saving their info in the session
-        req.session.student = {
-            id: student._id,
-            name: student.studentName,
-            rollNumber: student.rollNumber,
-            institute: student.institute // Store institute reference
-        };
+        // Generate JWT token
+        const token = jwt.sign(
+            {
+                id: student._id,
+                rollNumber: student.rollNumber,
+                name: student.studentName,
+                institute: student.institute,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: JWT_EXPIRATION || '1h' }
+        );
 
         res.status(200).json({
             message: 'Login successful',
-            student: req.session.student
+            token,
+            student: {
+                id: student._id,
+                name: student.studentName,
+                rollNumber: student.rollNumber,
+                institute: student.institute,
+            },
         });
     } catch (error) {
         res.status(500).json({ error: 'Server error: ' + error.message });
     }
 });
 
-// Student logout
+// Student logout (JWT logout is handled client-side by removing the token)
 router.post('/logout', (req, res) => {
-    if (req.session.student) {
-        req.session.destroy(err => {
-            if (err) {
-                return res.status(500).json({ error: 'Could not log out, please try again' });
-            }
-            res.clearCookie('connect.sid');  // Clear the session cookie
-            return res.status(200).json({ message: 'Logout successful' });
-        });
-    } else {
-        return res.status(400).json({ error: 'No student is logged in' });
-    }
+    res.status(200).json({ message: 'Logout successful. Please remove the token on the client side.' });
 });
 
-// Protected route (example)
-router.get('/profile', (req, res) => {
-    res.status(200).json({
-        message: 'Profile accessed successfully',
-        student: req.session.student
-    });
+// Fetch student profile with institute details
+router.get('/profile', isAuthenticated, async (req, res) => {
+    try {
+        const student = await Student.findById(req.student.id).populate('institute');
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        res.status(200).json({
+            message: 'Profile accessed successfully',
+            student,
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error: ' + error.message });
+    }
 });
 
 // Fetching all exams for the logged-in student's institute
 router.get('/exams', isAuthenticated, async (req, res) => {
     try {
-        // Fetch exams based on the student's institute
-        const exams = await Exam.find({ institute: req.session.student.institute });
+        const exams = await Exam.find({ institute: req.student.institute._id });
         res.status(200).json({
             exams,
-            message: 'Exams fetched successfully!'
+            message: 'Exams fetched successfully!',
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -95,15 +108,14 @@ router.get('/exams', isAuthenticated, async (req, res) => {
 router.get('/exams/:id', isAuthenticated, async (req, res) => {
     try {
         const exam = await Exam.findById(req.params.id).populate('questions');
-        
-        // Check if the exam has no questions
+
         if (!exam || exam.questions.length === 0) {
             return res.status(404).json({ error: 'No questions found for this exam' });
         }
 
         res.status(200).json({
             exam,
-            message: 'Exam fetched successfully!'
+            message: 'Exam fetched successfully!',
         });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -113,7 +125,7 @@ router.get('/exams/:id', isAuthenticated, async (req, res) => {
 // Exam attempt history
 router.get('/exams/history', isAuthenticated, async (req, res) => {
     try {
-        const student = await Student.findById(req.session.student.id).populate('examsTaken');
+        const student = await Student.findById(req.student.id).populate('examsTaken');
         res.status(200).json(student.examsTaken);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -122,24 +134,20 @@ router.get('/exams/history', isAuthenticated, async (req, res) => {
 
 // Submitting an exam
 router.post('/exams/:id/submit', isAuthenticated, async (req, res) => {
-    const { studentAnswers } = req.body; // Array of student's answers
+    const { studentAnswers } = req.body;
     const examId = req.params.id;
-    const studentId = req.session.student.id; // Use session to get student information
 
     try {
-        // Find the exam
         const exam = await Exam.findById(examId).populate('questions');
         if (!exam) {
             return res.status(404).json({ error: "Exam not found" });
         }
 
-        // Find the student
-        const student = await Student.findById(studentId);
+        const student = await Student.findById(req.student.id);
         if (!student) {
             return res.status(404).json({ error: "Student not found" });
         }
 
-        // Check if the student already attempted this exam
         if (student.examsTaken.includes(examId)) {
             return res.status(400).json({ error: "You have already attempted this exam." });
         }
@@ -147,9 +155,8 @@ router.post('/exams/:id/submit', isAuthenticated, async (req, res) => {
         let score = 0;
         let correctAnswers = 0;
 
-        // Calculate the score
         exam.questions.forEach((question, index) => {
-            const studentAnswer = studentAnswers[index]; // Student's answer for this question
+            const studentAnswer = studentAnswers[index];
             const correctAnswer = question.correctAnswer;
 
             if (studentAnswer === correctAnswer) {
@@ -157,28 +164,22 @@ router.post('/exams/:id/submit', isAuthenticated, async (req, res) => {
             }
         });
 
-        // Calculate score based on correct answers
         score = (correctAnswers / exam.questions.length) * exam.maxMarks;
-
-        // Determine if the student passed
         const passed = score >= exam.passMarks;
 
-        // Update the student's record
         student.examsTaken.push(examId);
-        student.score = score.toString(); // Convert score to string (if necessary)
+        student.score = score.toString();
         student.passed = passed;
 
-        // Save the updated student record
         await student.save();
 
-        // Update the exam record (log that the student attempted the exam)
-        exam.studentsAttempted.push(studentId);
+        exam.studentsAttempted.push(req.student.id);
         await exam.save();
 
         res.status(200).json({
             message: 'Exam submitted successfully!',
             score,
-            passed
+            passed,
         });
     } catch (error) {
         res.status(400).json({ error: error.message });
