@@ -27,11 +27,20 @@ const examSchema = new Schema({
         ref: 'institute',
         required: true
     },
-    studentsAttempted: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'student'
+    results: [{
+        student: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Student',
+            required: true,
+        },
+        wpm: Number,
+        marks: Number,
+        pass: Boolean,
+        dateTaken: {
+            type: Date,
+            default: Date.now,
+        },
     }],
-
     dateCreated: {
         type: Date,
         default: Date.now
