@@ -27,19 +27,6 @@ const TypingTestSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    results: [{
-        student: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Student',
-            required: true,
-        },
-        wpm: Number,
-        accuracy: Number,
-        dateTaken: {
-            type: Date,
-            default: Date.now,
-        },
-    }],
 });
 
 const TypingTest = mongoose.model('TypingTest', TypingTestSchema);
