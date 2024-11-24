@@ -184,16 +184,23 @@ router.get("/:instituteId/exams", async (req, res) => {
   }
 });
 // Get all exams of an exam
+
 router.get("/:examId/questions", async (req, res) => {
   const { examId } = req.params;
+
   try {
-    const questions = await Question.find({ exam: examId });
-    res.status(200).json(questions);
+    // Find the exam and populate its questions
+    const exam = await Exam.findById(examId).populate("questions");
+    
+    if (!exam) {
+      return res.status(404).json({ error: "Exam not found" });
+    }
+
+    res.status(200).json(exam.questions); // Return the populated questions
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
-
 
 // update feature
 
