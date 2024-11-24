@@ -481,7 +481,46 @@ router.post('/:testid/edit-typingtest', async (req, res) => {
   }
 });
 
+// Route for handling exam submission
+router.post('/submitExam/:examId', async (req, res) => {
+    const { studentId, wpm, marks, pass } = req.body;
+    const { examId } = req.params;
 
+    try {
+        // Check if the student exists
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(404).json({ msg: 'Student not found' });
+        }
+
+        // Find the exam document
+        const exam = await Exam.findById(examId);
+        if (!exam) {
+            return res.status(404).json({ msg: 'Exam not found' });
+        }
+
+        // Create a new result object
+        const newResult = {
+            student: studentId,
+            wpm,
+            marks,
+            pass,
+            dateTaken: new Date()
+        };
+
+        // Manually add the new result to the exam's results array
+        exam.results.push(newResult);
+
+        // Save the updated exam document
+        await exam.save();
+
+        // Respond with the updated exam results
+        res.status(200).json({ msg: 'Exam submitted successfully', examResults: exam.results });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 
 module.exports = router;
