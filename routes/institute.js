@@ -529,6 +529,30 @@ router.post('/submitExam/:examId', async (req, res) => {
     }
 });
 
+// Route to get results with full student details (excluding password and secCode)
+router.get('/:examId/results', async (req, res) => {
+    try {
+        const { examId } = req.params;
 
+        const examResults = await Exam.findById(examId)
+            .populate({
+                path: 'results.student',
+                select: '-password -secCode' // Exclude password and secCode
+            })
+            .select('results examName'); // Add any other fields you want to include from the Exam model
+
+        if (!examResults) {
+            return res.status(404).json({ error: 'Exam not found' });
+        }
+
+        res.status(200).json({
+            examName: examResults.examName,
+            results: examResults.results
+        });
+    } catch (error) {
+        console.error('Error fetching exam results:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 module.exports = router;
