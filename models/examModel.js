@@ -48,14 +48,6 @@ const examSchema = new Schema({
     duration: {
         type: Number // Duration in minutes
     },
-    maxMarks: {
-        type: Number,
-        required: true
-    },
-    passMarks: {
-        type: Number,
-        required: true
-    }
 });
 
 // Create the Exam model
