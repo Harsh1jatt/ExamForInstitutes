@@ -484,7 +484,7 @@ router.post('/:testid/edit-typingtest', async (req, res) => {
   }
 });
 
-// Route for handling exam submission
+// Route for handling exam submission// Route for handling exam submission
 router.post('/submitExam/:examId', async (req, res) => {
     const { studentId, wpm, marks, pass } = req.body;
     const { examId } = req.params;
@@ -505,11 +505,15 @@ router.post('/submitExam/:examId', async (req, res) => {
         // Create a new result object
         const newResult = {
             student: studentId,
-            wpm,
             marks,
             pass,
-            dateTaken: new Date()
+            dateTaken: new Date(),
         };
+
+        // Add wpm only if it exists
+        if (wpm !== undefined) {
+            newResult.wpm = wpm;
+        }
 
         // Manually add the new result to the exam's results array
         exam.results.push(newResult);
@@ -524,6 +528,7 @@ router.post('/submitExam/:examId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
 
 
 module.exports = router;
