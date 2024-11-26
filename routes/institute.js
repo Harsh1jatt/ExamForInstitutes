@@ -104,7 +104,7 @@ router.post("/:instituteId/exam", async (req, res) => {
       return res.status(404).json({ error: "Institute not found" });
     }
 
-    const { examName, examDescription, duration, maxMarks, passMarks } =
+    const { examName, examDescription, duration} =
       req.body;
 
     // Create a new exam
@@ -114,8 +114,6 @@ router.post("/:instituteId/exam", async (req, res) => {
       institute: instituteId,
       createdBy: instituteId,
       duration,
-      maxMarks,
-      passMarks,
     });
     await newExam.save();
 
@@ -207,7 +205,7 @@ router.get("/:examId/questions", async (req, res) => {
 // Edit exam (excluding password updates)
 router.post("/:examId/edit-exam", async (req, res) => {
   const { examId } = req.params;
-  const { examName, examDescription, duration, maxMarks, passMarks } = req.body;
+  const { examName, examDescription, duration } = req.body;
 
   try {
     // Prepare an object with only the fields that are present in req.body
@@ -215,8 +213,6 @@ router.post("/:examId/edit-exam", async (req, res) => {
     if (examName !== undefined) updateFields.examName = examName;
     if (examDescription !== undefined) updateFields.examDescription = examDescription;
     if (duration !== undefined) updateFields.duration = duration;
-    if (maxMarks !== undefined) updateFields.maxMarks = maxMarks;
-    if (passMarks !== undefined) updateFields.passMarks = passMarks;
 
     // Find and update the exam details with only the specified fields
     const exam = await Exam.findOneAndUpdate(
