@@ -491,12 +491,6 @@ router.post('/submitExam/:examId', async (req, res) => {
     const { examId } = req.params;
 
     try {
-        // Check if the student exists
-        const student = await Student.findOne({ RollNumber });
-        if (!student) {
-            return res.status(404).json({ msg: 'Student not found' });
-        }
-
         // Find the exam document
         const exam = await Exam.findById(examId);
         if (!exam) {
