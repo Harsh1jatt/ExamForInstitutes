@@ -486,7 +486,7 @@ router.post('/:testid/edit-typingtest', async (req, res) => {
 
 // Route for handling exam submission// Route for handling exam submission
 router.post('/submitExam/:examId', async (req, res) => {
-    const { studentId, wpm, marks, pass } = req.body;
+    const { studentName, RollNumber, profileImage, wpm, marks, pass } = req.body;
     const { examId } = req.params;
 
     try {
@@ -504,7 +504,9 @@ router.post('/submitExam/:examId', async (req, res) => {
 
         // Create a new result object
         const newResult = {
-            student: studentId,
+        studentName: String,
+        profileImage: String,
+        RollNumber: Number,
             marks,
             pass,
             dateTaken: new Date(),
@@ -528,19 +530,20 @@ router.post('/submitExam/:examId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
+results: [{
+        studentName: String,
+        profileImage: String,
+        RollNumber: Number,
+        wpm: Number,
+        marks: Number,
+        pass: Boolean,
+        dateTaken: {
 // Route to get results with full student details (excluding password and secCode)
 router.get('/:examId/results', async (req, res) => {
     try {
         const { examId } = req.params;
 
-        const examResults = await Exam.findById(examId)
-            .populate({
-                path: 'results.student',
-                select: '-password -secCode' // Exclude password and secCode
-            })
-            .select('results examName'); // Add any other fields you want to include from the Exam model
-
+        const examResults = await Exam.findById(examId);
         if (!examResults) {
             return res.status(404).json({ error: 'Exam not found' });
         }
