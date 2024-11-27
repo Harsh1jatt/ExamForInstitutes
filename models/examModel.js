@@ -30,7 +30,7 @@ const examSchema = new Schema({
     results: [{
         studentName: String,
         profileImage: String,
-        RollNumber: Number,
+        RollNumber: String,
         wpm: Number,
         marks: Number,
         pass: Boolean,
