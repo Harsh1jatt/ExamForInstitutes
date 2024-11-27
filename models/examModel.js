@@ -28,11 +28,9 @@ const examSchema = new Schema({
         required: true
     },
     results: [{
-        student: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Student',
-            required: true,
-        },
+        studentName: String,
+        profileImage: String,
+        RollNumber: Number,
         wpm: Number,
         marks: Number,
         pass: Boolean,
