@@ -530,14 +530,6 @@ router.post('/submitExam/:examId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-results: [{
-        studentName: String,
-        profileImage: String,
-        RollNumber: Number,
-        wpm: Number,
-        marks: Number,
-        pass: Boolean,
-        dateTaken: {
 // Route to get results with full student details (excluding password and secCode)
 router.get('/:examId/results', async (req, res) => {
     try {
