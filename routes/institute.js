@@ -485,13 +485,14 @@ router.post('/:testid/edit-typingtest', async (req, res) => {
 });
 
 // Route for handling exam submission// Route for handling exam submission
+
 router.post('/submitExam/:examId', async (req, res) => {
     const { studentName, RollNumber, profileImage, wpm, marks, pass } = req.body;
     const { examId } = req.params;
 
     try {
         // Check if the student exists
-        const student = await Student.findById(studentId);
+        const student = await Student.findOne({ RollNumber });
         if (!student) {
             return res.status(404).json({ msg: 'Student not found' });
         }
@@ -504,20 +505,20 @@ router.post('/submitExam/:examId', async (req, res) => {
 
         // Create a new result object
         const newResult = {
-        studentName: String,
-        profileImage: String,
-        RollNumber: Number,
+            studentName,
+            RollNumber,
+            profileImage,
             marks,
             pass,
             dateTaken: new Date(),
         };
 
         // Add wpm only if it exists
-        if (wpm !== undefined) {
+        if (wpm) {
             newResult.wpm = wpm;
         }
 
-        // Manually add the new result to the exam's results array
+        // Add the new result to the exam's results array
         exam.results.push(newResult);
 
         // Save the updated exam document
@@ -530,6 +531,8 @@ router.post('/submitExam/:examId', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+
 // Route to get results with full student details (excluding password and secCode)
 router.get('/:examId/results', async (req, res) => {
     try {
